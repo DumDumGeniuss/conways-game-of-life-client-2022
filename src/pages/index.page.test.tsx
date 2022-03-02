@@ -11,7 +11,7 @@ describe('Home', () => {
       </Provider>
     );
 
-    const greetingsDom = screen.getByText('index.greetings');
+    const greetingsDom = screen.getByText('index.conways.game');
 
     expect(greetingsDom).toBeInTheDocument();
   });
