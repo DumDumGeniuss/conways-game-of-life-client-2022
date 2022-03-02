@@ -1,10 +1,10 @@
-# Next Boilerplate 2022
+# Conways Game of Life Client 2022
 
-This [Next.js](https://nextjs.org/) boilerplate 2022 allows you to kick off your new project with all necessary tools for building a large-scale client-side web app.
+This project is powered by [Next.js](https://nextjs.org/).
 
-![Vercel](https://vercelbadge.vercel.app/api/DumDumGeniuss/dumdum-next-boilerplate-2022)
+![Vercel](https://vercelbadge.vercel.app/api/DumDumGeniuss/conways-game-of-life-2022)
 
-## Features
+## What's Included?
 
 ### Linting
 
