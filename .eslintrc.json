@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "plugin:@next/next/recommended",
+    "airbnb",
+    "airbnb-typescript",
+    "prettier"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/extensions": "off",
+    "default-param-last": "off",
+    "@typescript-eslint/default-param-last": "off",
+    "no-param-reassign": [
+      "error",
+      { "props": true, "ignorePropertyModificationsFor": ["state"] }
+    ]
+  }
+}
