@@ -14,8 +14,10 @@ const Home: NextPage = function Home() {
 
   return (
     <main>
-      <h1>{t('conways.game', { ns: 'index' })}</h1>
-      <ConwaysBoard size={800} />
+      <h1 className="text-center m-5">{t('conways.game', { ns: 'index' })}</h1>
+      <div className="flex justify-center">
+        <ConwaysBoard size={500} />
+      </div>
     </main>
   );
 };
