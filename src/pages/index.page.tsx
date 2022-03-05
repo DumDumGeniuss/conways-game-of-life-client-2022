@@ -10,7 +10,7 @@ import {
   startConwaysGame,
   StartConwaysGameEvents,
 } from '@/hooks/start-conways-game';
-import { CleanBoard, CleanCell, Player } from '@/libs/ConwaysGameCanvas/types';
+import { CleanBoard, Player } from '@/libs/ConwaysGameCanvas/types';
 
 type Props = {
   socketUrl: string;
@@ -26,14 +26,25 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
 
   // Callbacks for startConwaysGame Hook
   const startConwaysGameEvents: StartConwaysGameEvents = {
-    onGameStarted: (size: number, b: CleanBoard, p: Player): any => {
-      conwaysBoardRef.current?.startGame(size, b, p);
-    },
-    onReviveCellFailed: (x: number, y: number, cell: CleanCell): any => {
-      conwaysBoardRef.current?.updateCell(x, y, cell);
+    onGameStarted: (
+      size: number,
+      b: CleanBoard,
+      p: Player,
+      ps: Player[]
+    ): any => {
+      conwaysBoardRef.current?.startGame(size, b, p, ps);
     },
     onBoardUpdated: (b: CleanBoard): any => {
       conwaysBoardRef.current?.updateBoard(b);
+    },
+    onPlayerJoined: (p: Player): any => {
+      conwaysBoardRef.current?.addPlayer(p);
+    },
+    onPlayerLeft: (playerId: string): any => {
+      conwaysBoardRef.current?.removePlayer(playerId);
+    },
+    onCellRevived: (x: number, y: number, playerId: string): any => {
+      conwaysBoardRef.current?.reviveCell(x, y, playerId);
     },
   };
 

@@ -7,9 +7,17 @@ type Props = {
 };
 
 export type ConwaysBoardCommands = {
-  startGame: (size: number, board: CleanBoard, player: Player) => any;
+  startGame: (
+    size: number,
+    board: CleanBoard,
+    player: Player,
+    players: Player[]
+  ) => any;
   updateBoard: (board: CleanBoard) => any;
   updateCell: (x: number, y: number, cell: CleanCell) => any;
+  addPlayer: (p: Player) => void;
+  removePlayer: (playerId: string) => void;
+  reviveCell: (x: number, y: number, playerId: string) => void;
 };
 
 const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
@@ -18,8 +26,10 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
     const [conwayBoard, setConwayBoard] = useState<ConwaysGameCanvas | null>(
       null
     );
+
+    // These methods are accessible by the parent components.
     useImperativeHandle(ref, () => ({
-      startGame(size: number, b: CleanBoard, p: Player) {
+      startGame(size: number, b: CleanBoard, p: Player, ps: Player[]) {
         if (!conwayBoardRef.current) {
           return;
         }
@@ -29,6 +39,7 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
           size,
           b,
           p,
+          ps,
           onReviveCell
         );
         setConwayBoard(newBoard);
@@ -38,6 +49,15 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
       },
       updateCell(x: number, y: number, cell: CleanCell) {
         conwayBoard?.setCell(x, y, cell);
+      },
+      addPlayer(p: Player) {
+        conwayBoard?.addPlayer(p);
+      },
+      removePlayer(playerId: string) {
+        conwayBoard?.removePlayer(playerId);
+      },
+      reviveCell(x: number, y: number, playerId: string) {
+        conwayBoard?.reviveCell(x, y, playerId);
       },
     }));
 

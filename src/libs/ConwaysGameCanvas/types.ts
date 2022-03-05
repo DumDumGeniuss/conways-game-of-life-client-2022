@@ -10,4 +10,8 @@ export type Player = {
   color: string;
 };
 
+export type PlayersMap = {
+  [playerId: string]: Player;
+};
+
 export default {};

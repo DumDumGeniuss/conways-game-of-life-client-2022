@@ -9,6 +9,7 @@ describe('ConwaysBoard', () => {
       1,
       [[{ live: false, color: '#000000' }]],
       { id: '1', color: '#000000' },
+      [{ id: '1', color: '#000000' }],
       onReviveCell
     );
 

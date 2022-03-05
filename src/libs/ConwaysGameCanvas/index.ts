@@ -1,4 +1,4 @@
-import { CleanBoard, CleanCell, Player } from './types';
+import { CleanBoard, CleanCell, Player, PlayersMap } from './types';
 
 export type ReviveCellHandler = (x: number, y: number) => any;
 
@@ -13,7 +13,9 @@ export class ConwaysGameCanvas {
 
   private board: CleanBoard = [];
 
-  private player: Player | null = null;
+  private currentPlayerId: string;
+
+  private playersMap: PlayersMap = {};
 
   private onReviveCell: ReviveCellHandler;
 
@@ -22,11 +24,13 @@ export class ConwaysGameCanvas {
     size: number,
     board: CleanBoard,
     player: Player,
+    players: Player[],
     onReviveCell: ReviveCellHandler
   ) {
     this.size = size;
     this.setBoard(board);
-    this.setPlayer(player);
+    this.currentPlayerId = player.id;
+    this.setPlayers(players);
     this.onReviveCell = onReviveCell;
     this.canvasDom = document.createElement('canvas');
     this.context = this.canvasDom.getContext('2d');
@@ -49,7 +53,7 @@ export class ConwaysGameCanvas {
     if (!this.canvasDom) {
       return;
     }
-    if (!this.player) {
+    if (!this.playersMap[this.currentPlayerId]) {
       return;
     }
     const rect = this.canvasDom.getBoundingClientRect();
@@ -60,7 +64,8 @@ export class ConwaysGameCanvas {
     const y = Math.floor((realY * ratio) / this.unit);
 
     if (!this.board[x][y].live) {
-      this.reviveCel(x, y);
+      this.reviveCell(x, y, this.currentPlayerId);
+      this.onReviveCell(x, y);
     }
   }
 
@@ -68,8 +73,18 @@ export class ConwaysGameCanvas {
     return x < 0 || x >= this.size || y < 0 || y >= this.size;
   }
 
-  setPlayer(p: Player) {
-    this.player = p;
+  setPlayers(ps: Player[]) {
+    ps.forEach((p) => {
+      this.addPlayer(p);
+    });
+  }
+
+  addPlayer(p: Player) {
+    this.playersMap[p.id] = p;
+  }
+
+  removePlayer(playerId: string) {
+    delete this.playersMap[playerId];
   }
 
   setBoard(b: CleanBoard) {
@@ -86,14 +101,13 @@ export class ConwaysGameCanvas {
     this.drawCell(x, y);
   }
 
-  reviveCel(x: number, y: number) {
-    if (!this.player) {
+  reviveCell(x: number, y: number, playerId: string) {
+    if (!this.playersMap[playerId]) {
       return;
     }
     this.board[x][y].live = true;
-    this.board[x][y].color = this.player.color;
+    this.board[x][y].color = this.playersMap[playerId].color;
     this.drawCell(x, y);
-    this.onReviveCell(x, y);
   }
 
   private drawCell(x: number, y: number) {
