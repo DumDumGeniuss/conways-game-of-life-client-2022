@@ -7,7 +7,7 @@ describe('Home', () => {
   it('Has greetings', () => {
     render(
       <Provider store={makeStore()}>
-        <Home />
+        <Home socketUrl="ws://example.com" />
       </Provider>
     );
 
