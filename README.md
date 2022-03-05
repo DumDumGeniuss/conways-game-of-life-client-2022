@@ -2,7 +2,7 @@
 
 This project is powered by [Next.js](https://nextjs.org/).
 
-![Vercel](https://vercelbadge.vercel.app/api/DumDumGeniuss/conways-game-of-life)
+![Vercel](https://vercelbadge.vercel.app/api/DumDumGeniuss/conways-game-of-life-client-2022)
 
 ## Deployment Guide
 
