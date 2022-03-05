@@ -41,7 +41,6 @@ export function startConwaysGame(
     newSocket.on(
       'game_started',
       (size: number, p: Player, ps: Player[], b: CleanBoard) => {
-        console.log('started');
         setStarted(true);
         events.onGameStarted(size, b, p);
       }

@@ -41,7 +41,7 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
       },
     }));
 
-    return <div ref={conwayBoardRef} className="w-full" />;
+    return <div ref={conwayBoardRef} className="w-full h-full" />;
   }
 );
 
