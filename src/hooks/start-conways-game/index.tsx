@@ -7,6 +7,17 @@ type User = {
   color: string;
 };
 
+enum SocketEventName {
+  Logged = 'logged',
+  GameStarted = 'game_started',
+  PlayerJoined = 'player_joined',
+  PlayerLeft = 'player_left',
+  CellRevived = 'cell_revived',
+  BoardUpdated = 'board_updated',
+  ReviveCell = 'revive_cell',
+  ConnectError = 'connect_error',
+}
+
 export type StartConwaysGameEvents = {
   onGameStarted: (size: number, b: CleanBoard, p: Player, ps: Player[]) => any;
   onBoardUpdated: (b: CleanBoard) => any;
@@ -26,7 +37,7 @@ export function startConwaysGame(
     if (!conwaySocket) {
       return;
     }
-    conwaySocket.emit('revive_cell', x, y);
+    conwaySocket.emit(SocketEventName.ReviveCell, x, y);
   };
   useEffect(() => {
     const newSocket = io(`${socketUrl}/conways-game`, {
@@ -36,35 +47,38 @@ export function startConwaysGame(
     });
     setConwaySocket(newSocket);
 
-    newSocket.on('logged', (u: User, token: string) => {
+    newSocket.on(SocketEventName.Logged, (u: User, token: string) => {
       sessionStorage.setItem('auth_token', token);
     });
 
     newSocket.on(
-      'game_started',
+      SocketEventName.GameStarted,
       (size: number, p: Player, ps: Player[], b: CleanBoard) => {
         setStarted(true);
         events.onGameStarted(size, b, p, ps);
       }
     );
 
-    newSocket.on('player_joined', (p: Player) => {
+    newSocket.on(SocketEventName.PlayerJoined, (p: Player) => {
       events.onPlayerJoined(p);
     });
 
-    newSocket.on('player_left', (playerId: string) => {
+    newSocket.on(SocketEventName.PlayerLeft, (playerId: string) => {
       events.onPlayerLeft(playerId);
     });
 
-    newSocket.on('cell_revived', (x: number, y: number, playerId: string) => {
-      events.onCellRevived(x, y, playerId);
-    });
+    newSocket.on(
+      SocketEventName.CellRevived,
+      (x: number, y: number, playerId: string) => {
+        events.onCellRevived(x, y, playerId);
+      }
+    );
 
-    newSocket.on('board_updated', (b: CleanBoard) => {
+    newSocket.on(SocketEventName.BoardUpdated, (b: CleanBoard) => {
       events.onBoardUpdated(b);
     });
 
-    newSocket.on('connect_error', () => {});
+    newSocket.on(SocketEventName.ConnectError, () => {});
   }, []);
 
   return { started, reviveCell };
