@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { Player, CleanBoard, CleanCell } from '@/libs/ConwaysGameCanvas/types';
 
 export type StartConwaysGameEvents = {
-  onGameStarted: (b: CleanBoard, p: Player) => any;
-  onCellRevived: (x: number, y: number, cell: CleanCell) => any;
+  onGameStarted: (size: number, b: CleanBoard, p: Player) => any;
+  onReviveCellFailed: (x: number, y: number, c: CleanCell) => any;
   onBoardUpdated: (b: CleanBoard) => any;
 };
 
@@ -15,11 +15,11 @@ export function startConwaysGame(
   const [started, setStarted] = useState<boolean>(false);
   const [conwaySocket, setConwaySocket] = useState<ReturnType<typeof io>>();
 
-  const reviveCell = (x: number, y: number, p: Player) => {
+  const reviveCell = (x: number, y: number) => {
     if (!conwaySocket) {
       return;
     }
-    conwaySocket.emit('revive_cell', x, y, p.id);
+    conwaySocket.emit('revive_cell', x, y);
   };
   useEffect(() => {
     const newSocket = io(`${socketUrl}/conways-game`, {
@@ -29,14 +29,20 @@ export function startConwaysGame(
     });
     setConwaySocket(newSocket);
 
-    newSocket.on('game_started', (p: Player, b: CleanBoard) => {
-      setStarted(true);
-      events.onGameStarted(b, p);
-    });
+    newSocket.on(
+      'game_started',
+      (size: number, p: Player, ps: Player[], b: CleanBoard) => {
+        setStarted(true);
+        events.onGameStarted(size, b, p);
+      }
+    );
 
-    newSocket.on('cell_revived', (x: number, y: number, cell: CleanCell) => {
-      events.onCellRevived(x, y, cell);
-    });
+    newSocket.on(
+      'revive_cell_failed',
+      (x: number, y: number, cell: CleanCell) => {
+        events.onReviveCellFailed(x, y, cell);
+      }
+    );
 
     newSocket.on('board_updated', (b: CleanBoard) => {
       events.onBoardUpdated(b);

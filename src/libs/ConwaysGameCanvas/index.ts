@@ -1,6 +1,6 @@
 import { CleanBoard, CleanCell, Player } from './types';
 
-export type CellClickHandler = (x: number, y: number, p: Player) => any;
+export type ReviveCellHandler = (x: number, y: number) => any;
 
 export class ConwaysGameCanvas {
   private canvasDom: HTMLCanvasElement | null;
@@ -15,19 +15,19 @@ export class ConwaysGameCanvas {
 
   private player: Player | null = null;
 
-  private onCellClick: CellClickHandler;
+  private onReviveCell: ReviveCellHandler;
 
   constructor(
     element: HTMLElement,
     size: number,
     board: CleanBoard,
     player: Player,
-    onCellClick: CellClickHandler
+    onReviveCell: ReviveCellHandler
   ) {
     this.size = size;
     this.setBoard(board);
     this.setPlayer(player);
-    this.onCellClick = onCellClick;
+    this.onReviveCell = onReviveCell;
     this.canvasDom = document.createElement('canvas');
     this.context = this.canvasDom.getContext('2d');
     if (this.context) {
@@ -59,7 +59,9 @@ export class ConwaysGameCanvas {
     const x = Math.floor((realX * ratio) / this.unit);
     const y = Math.floor((realY * ratio) / this.unit);
 
-    this.onCellClick(x, y, this.player);
+    if (!this.board[x][y].live) {
+      this.reviveCel(x, y);
+    }
   }
 
   private exceedBoader(x: number, y: number) {
@@ -74,24 +76,35 @@ export class ConwaysGameCanvas {
     this.board = b;
     for (let i = 0; i < b.length; i += 1) {
       for (let j = 0; j < b[i].length; j += 1) {
-        this.drawCell(i, j, b[i][j].color);
+        this.drawCell(i, j);
       }
     }
   }
 
   setCell(x: number, y: number, cell: CleanCell) {
     this.board[x][y] = cell;
-    this.drawCell(x, y, cell.color);
+    this.drawCell(x, y);
   }
 
-  private drawCell(x: number, y: number, color: string) {
+  reviveCel(x: number, y: number) {
+    if (!this.player) {
+      return;
+    }
+    this.board[x][y].live = true;
+    this.board[x][y].color = this.player.color;
+    this.drawCell(x, y);
+    this.onReviveCell(x, y);
+  }
+
+  private drawCell(x: number, y: number) {
     if (!this.context) {
       return;
     }
     if (this.exceedBoader(x, y)) {
       return;
     }
-    this.context.fillStyle = color;
+    const cell = this.board[x][y];
+    this.context.fillStyle = cell.color;
     this.context.fillRect(
       x * this.unit,
       y * this.unit,

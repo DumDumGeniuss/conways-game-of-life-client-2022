@@ -25,11 +25,11 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
 
   // Callbacks for startConwaysGame Hook
   const startConwaysGameEvents: StartConwaysGameEvents = {
-    onGameStarted: (b: CleanBoard, p: Player): any => {
-      conwaysBoardRef.current?.startGame(b, p);
+    onGameStarted: (size: number, b: CleanBoard, p: Player): any => {
+      conwaysBoardRef.current?.startGame(size, b, p);
     },
-    onCellRevived: (x: number, y: number, cell: CleanCell): any => {
-      conwaysBoardRef.current?.reviveCell(x, y, cell);
+    onReviveCellFailed: (x: number, y: number, cell: CleanCell): any => {
+      conwaysBoardRef.current?.updateCell(x, y, cell);
     },
     onBoardUpdated: (b: CleanBoard): any => {
       conwaysBoardRef.current?.updateBoard(b);
@@ -41,8 +41,8 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
     startConwaysGameEvents
   );
 
-  const onCellClick = (x: number, y: number, p: Player) => {
-    reviveCell(x, y, p);
+  const onReviveCell = (x: number, y: number) => {
+    reviveCell(x, y);
   };
 
   return (
@@ -51,11 +51,7 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
       <div className="flex justify-center">
         <div className="w-9/12">
           {started ? (
-            <ConwaysBoard
-              ref={conwaysBoardRef}
-              size={10}
-              onCellClick={onCellClick}
-            />
+            <ConwaysBoard ref={conwaysBoardRef} onReviveCell={onReviveCell} />
           ) : null}
         </div>
       </div>
