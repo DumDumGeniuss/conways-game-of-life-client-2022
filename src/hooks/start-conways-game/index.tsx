@@ -2,6 +2,11 @@ import { io } from 'socket.io-client';
 import { useEffect, useState } from 'react';
 import { Player, CleanBoard, CleanCell } from '@/libs/ConwaysGameCanvas/types';
 
+type User = {
+  id: string;
+  color: string;
+};
+
 export type StartConwaysGameEvents = {
   onGameStarted: (size: number, b: CleanBoard, p: Player) => any;
   onReviveCellFailed: (x: number, y: number, c: CleanCell) => any;
@@ -24,14 +29,19 @@ export function startConwaysGame(
   useEffect(() => {
     const newSocket = io(`${socketUrl}/conways-game`, {
       auth: {
-        authorization: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA3OTgzNTQ3MDA0MSIsImNvbG9yIjoiIzEyMzQ1NiIsImlhdCI6MTY0NjM4NDg3N30.fCWHQbtXDMssgkuu4J1ZwW-DbyXPbFr9WqYfgz-Aerk`,
+        authorization: sessionStorage.getItem('auth_token'),
       },
     });
     setConwaySocket(newSocket);
 
+    newSocket.on('logged', (u: User, token: string) => {
+      sessionStorage.setItem('auth_token', token);
+    });
+
     newSocket.on(
       'game_started',
       (size: number, p: Player, ps: Player[], b: CleanBoard) => {
+        console.log('started');
         setStarted(true);
         events.onGameStarted(size, b, p);
       }
