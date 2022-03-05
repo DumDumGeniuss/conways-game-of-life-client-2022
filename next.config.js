@@ -3,6 +3,7 @@ const { i18n } = require('./next-i18next.config');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
+    PORT: process.env.PORT,
     SOCKET_URL: process.env.SOCKET_URL,
     API_URL: process.env.API_URL,
   },
