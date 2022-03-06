@@ -10,7 +10,7 @@ import {
   startConwaysGame,
   StartConwaysGameEvents,
 } from '@/hooks/start-conways-game';
-import { CleanBoard, Player } from '@/libs/ConwaysGameCanvas/types';
+import { CleanBoard, CleanCell, Player } from '@/libs/ConwaysGameCanvas/types';
 
 type Props = {
   socketUrl: string;
@@ -37,24 +37,28 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
     onBoardUpdated: (b: CleanBoard): any => {
       conwaysBoardRef.current?.updateBoard(b);
     },
+    onCellUpdated: (x: number, y: number, c: CleanCell): any => {
+      conwaysBoardRef.current?.updateCell(x, y, c);
+    },
     onPlayerJoined: (p: Player): any => {
       conwaysBoardRef.current?.addPlayer(p);
     },
     onPlayerLeft: (playerId: string): any => {
       conwaysBoardRef.current?.removePlayer(playerId);
     },
-    onCellRevived: (x: number, y: number, playerId: string): any => {
-      conwaysBoardRef.current?.reviveCell(x, y, playerId);
-    },
   };
 
-  const { started, reviveCell } = startConwaysGame(
+  const { started, reviveCell, killCell } = startConwaysGame(
     socketUrl,
     startConwaysGameEvents
   );
 
   const onReviveCell = (x: number, y: number) => {
     reviveCell(x, y);
+  };
+
+  const onKillCell = (x: number, y: number) => {
+    killCell(x, y);
   };
 
   useEffect(() => {
@@ -77,7 +81,11 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
           `}
         >
           {started ? (
-            <ConwaysBoard ref={conwaysBoardRef} onReviveCell={onReviveCell} />
+            <ConwaysBoard
+              ref={conwaysBoardRef}
+              onReviveCell={onReviveCell}
+              onKillCell={onKillCell}
+            />
           ) : null}
         </div>
       </div>

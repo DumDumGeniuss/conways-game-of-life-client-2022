@@ -1,9 +1,14 @@
 import { forwardRef, useRef, useState, useImperativeHandle } from 'react';
-import { ConwaysGameCanvas, ReviveCellHandler } from '@/libs/ConwaysGameCanvas';
+import {
+  ConwaysGameCanvas,
+  ReviveCellHandler,
+  KillCellHandler,
+} from '@/libs/ConwaysGameCanvas';
 import { CleanBoard, CleanCell, Player } from '@/libs/ConwaysGameCanvas/types';
 
 type Props = {
   onReviveCell: ReviveCellHandler;
+  onKillCell: KillCellHandler;
 };
 
 export type ConwaysBoardCommands = {
@@ -17,11 +22,10 @@ export type ConwaysBoardCommands = {
   updateCell: (x: number, y: number, cell: CleanCell) => any;
   addPlayer: (p: Player) => void;
   removePlayer: (playerId: string) => void;
-  reviveCell: (x: number, y: number, playerId: string) => void;
 };
 
 const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
-  ({ onReviveCell }, ref) => {
+  ({ onReviveCell, onKillCell }, ref) => {
     const conwayBoardRef = useRef<HTMLDivElement | null>(null);
     const [conwayBoard, setConwayBoard] = useState<ConwaysGameCanvas | null>(
       null
@@ -40,7 +44,8 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
           b,
           p,
           ps,
-          onReviveCell
+          onReviveCell,
+          onKillCell
         );
         setConwayBoard(newBoard);
       },
@@ -55,9 +60,6 @@ const ConwaysBoard = forwardRef<ConwaysBoardCommands, Props>(
       },
       removePlayer(playerId: string) {
         conwayBoard?.removePlayer(playerId);
-      },
-      reviveCell(x: number, y: number, playerId: string) {
-        conwayBoard?.reviveCell(x, y, playerId);
       },
     }));
 

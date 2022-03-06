@@ -1,6 +1,7 @@
 import { CleanBoard, CleanCell, Player, PlayersMap } from './types';
 
 export type ReviveCellHandler = (x: number, y: number) => any;
+export type KillCellHandler = (x: number, y: number) => any;
 
 export class ConwaysGameCanvas {
   private canvasDom: HTMLCanvasElement | null;
@@ -19,19 +20,23 @@ export class ConwaysGameCanvas {
 
   private onReviveCell: ReviveCellHandler;
 
+  private onKillCell: KillCellHandler;
+
   constructor(
     element: HTMLElement,
     size: number,
     board: CleanBoard,
     player: Player,
     players: Player[],
-    onReviveCell: ReviveCellHandler
+    onReviveCell: ReviveCellHandler,
+    onKillCell: KillCellHandler
   ) {
     this.size = size;
     this.setBoard(board);
     this.currentPlayerId = player.id;
     this.setPlayers(players);
     this.onReviveCell = onReviveCell;
+    this.onKillCell = onKillCell;
     this.canvasDom = document.createElement('canvas');
     this.context = this.canvasDom.getContext('2d');
     if (this.context) {
@@ -63,9 +68,16 @@ export class ConwaysGameCanvas {
     const x = Math.floor((realX * ratio) / this.unit);
     const y = Math.floor((realY * ratio) / this.unit);
 
-    if (!this.board[x][y].live) {
-      this.reviveCell(x, y, this.currentPlayerId);
-      this.onReviveCell(x, y);
+    if (this.board[x][y].live) {
+      const succeed = this.killCell(x, y, this.currentPlayerId);
+      if (succeed) {
+        this.onKillCell(x, y);
+      }
+    } else {
+      const succeed = this.reviveCell(x, y, this.currentPlayerId);
+      if (succeed) {
+        this.onReviveCell(x, y);
+      }
     }
   }
 
@@ -101,13 +113,31 @@ export class ConwaysGameCanvas {
     this.drawCell(x, y);
   }
 
-  reviveCell(x: number, y: number, playerId: string) {
+  reviveCell(x: number, y: number, playerId: string): boolean {
     if (!this.playersMap[playerId]) {
-      return;
+      return false;
     }
     this.board[x][y].live = true;
     this.board[x][y].color = this.playersMap[playerId].color;
     this.drawCell(x, y);
+
+    return true;
+  }
+
+  killCell(x: number, y: number, playerId: string): boolean {
+    if (!this.playersMap[playerId]) {
+      return false;
+    }
+    if (this.board[x][y].playerIds.indexOf(playerId) === -1) {
+      return false;
+    }
+    console.log('hi');
+    this.board[x][y].live = false;
+    this.board[x][y].color = '#000000';
+    this.board[x][y].playerIds = [];
+    this.drawCell(x, y);
+
+    return true;
   }
 
   private drawCell(x: number, y: number) {

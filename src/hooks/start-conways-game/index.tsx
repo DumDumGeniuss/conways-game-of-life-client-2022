@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 import { useEffect, useState } from 'react';
-import { Player, CleanBoard } from '@/libs/ConwaysGameCanvas/types';
+import { Player, CleanBoard, CleanCell } from '@/libs/ConwaysGameCanvas/types';
 
 type User = {
   id: string;
@@ -12,16 +12,17 @@ enum SocketEventName {
   GameStarted = 'game_started',
   PlayerJoined = 'player_joined',
   PlayerLeft = 'player_left',
-  CellRevived = 'cell_revived',
   BoardUpdated = 'board_updated',
+  CellUpdated = 'cell_updated',
   ReviveCell = 'revive_cell',
+  KillCell = 'kill_cell',
   ConnectError = 'connect_error',
 }
 
 export type StartConwaysGameEvents = {
   onGameStarted: (size: number, b: CleanBoard, p: Player, ps: Player[]) => any;
   onBoardUpdated: (b: CleanBoard) => any;
-  onCellRevived: (x: number, y: number, playerId: string) => any;
+  onCellUpdated: (x: number, y: number, c: CleanCell) => any;
   onPlayerJoined: (p: Player) => any;
   onPlayerLeft: (playerId: string) => any;
 };
@@ -38,6 +39,12 @@ export function startConwaysGame(
       return;
     }
     conwaySocket.emit(SocketEventName.ReviveCell, x, y);
+  };
+  const killCell = (x: number, y: number) => {
+    if (!conwaySocket) {
+      return;
+    }
+    conwaySocket.emit(SocketEventName.KillCell, x, y);
   };
   useEffect(() => {
     const newSocket = io(`${socketUrl}/conways-game`, {
@@ -67,21 +74,21 @@ export function startConwaysGame(
       events.onPlayerLeft(playerId);
     });
 
-    newSocket.on(
-      SocketEventName.CellRevived,
-      (x: number, y: number, playerId: string) => {
-        events.onCellRevived(x, y, playerId);
-      }
-    );
-
     newSocket.on(SocketEventName.BoardUpdated, (b: CleanBoard) => {
       events.onBoardUpdated(b);
     });
 
+    newSocket.on(
+      SocketEventName.CellUpdated,
+      (x: number, y: number, c: CleanCell) => {
+        events.onCellUpdated(x, y, c);
+      }
+    );
+
     newSocket.on(SocketEventName.ConnectError, () => {});
   }, []);
 
-  return { started, reviveCell };
+  return { started, reviveCell, killCell };
 }
 
 export default {};

@@ -1,6 +1,7 @@
 export type CleanCell = {
   live: boolean;
   color: string;
+  playerIds: string[];
 };
 
 export type CleanBoard = CleanCell[][];
