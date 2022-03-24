@@ -27,7 +27,7 @@ export type StartConwaysGameEvents = {
   onPlayerLeft: (playerId: string) => any;
 };
 
-export function startConwaysGame(
+export function useStartConwaysGame(
   socketUrl: string,
   events: StartConwaysGameEvents
 ) {

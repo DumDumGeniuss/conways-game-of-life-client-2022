@@ -7,7 +7,7 @@ import { getInitialLocale } from '@/utils/i18n';
 import { wrapper } from '@/stores';
 import ConwaysBoard, { ConwaysBoardCommands } from '@/components/ConwaysBoard';
 import {
-  startConwaysGame,
+  useStartConwaysGame,
   StartConwaysGameEvents,
 } from '@/hooks/start-conways-game';
 import { CleanBoard, CleanCell, Player } from '@/libs/ConwaysGameCanvas/types';
@@ -48,7 +48,7 @@ const Home: NextPage<Props> = function Home({ socketUrl }) {
     },
   };
 
-  const { started, reviveCell, killCell } = startConwaysGame(
+  const { started, reviveCell, killCell } = useStartConwaysGame(
     socketUrl,
     startConwaysGameEvents
   );
